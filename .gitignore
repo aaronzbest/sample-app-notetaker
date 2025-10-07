@@ -6,3 +6,4 @@ src/database/*.sqlite
 dist/
 *.tgz
 coverage/
+.claude/
