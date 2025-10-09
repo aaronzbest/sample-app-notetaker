@@ -30,6 +30,7 @@ class NoteEditor extends HTMLElement {
         const isEditing = this.noteId !== null;
         const title = this.note ? this.note.title : '';
         const content = this.note ? this.note.content : '';
+        const currentColor = this.note ? this.note.color : '#fef3c7';
 
         this.innerHTML = `
             <div class="editor-container">
@@ -54,6 +55,14 @@ class NoteEditor extends HTMLElement {
                         >
                     </div>
 
+                    <div class="color-picker-container">
+                        <label class="color-picker-label">Background Color:</label>
+                        <div class="color-picker-options">
+                            ${this.renderColorOptions(currentColor)}
+                        </div>
+                        <input type="hidden" id="note-color" name="color" value="${currentColor}">
+                    </div>
+
                     <div class="form-group">
                         <label for="note-content">Content:</label>
                         <textarea
@@ -70,6 +79,28 @@ class NoteEditor extends HTMLElement {
         this.focusTitleInput();
     }
 
+    renderColorOptions(selectedColor) {
+        const colors = [
+            { hex: '#fef3c7', name: 'Pale Yellow' },
+            { hex: '#fde2e7', name: 'Pale Pink' },
+            { hex: '#e0e7ff', name: 'Pale Indigo' },
+            { hex: '#d1fae5', name: 'Pale Green' },
+            { hex: '#fed7ba', name: 'Pale Orange' },
+            { hex: '#f3e8ff', name: 'Pale Purple' },
+            { hex: '#bfdbfe', name: 'Pale Blue' },
+            { hex: '#fecaca', name: 'Pale Red' }
+        ];
+
+        return colors.map(color => `
+            <div
+                class="color-option ${color.hex === selectedColor ? 'selected' : ''}"
+                data-color="${color.hex}"
+                style="background-color: ${color.hex};"
+                title="${color.name}"
+            ></div>
+        `).join('');
+    }
+
     setupEventListeners() {
         const form = this.querySelector('#note-form');
         const saveBtn = this.querySelector('#save-btn');
@@ -83,7 +114,26 @@ class NoteEditor extends HTMLElement {
         saveBtn.addEventListener('click', () => this.handleSave());
         cancelBtn.addEventListener('click', () => this.handleCancel());
 
+        // Color picker event listeners
+        this.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                this.handleColorSelect(e.target.dataset.color);
+            });
+        });
+
         document.addEventListener('keydown', this.handleKeydown.bind(this));
+    }
+
+    handleColorSelect(color) {
+        // Update hidden input
+        const colorInput = this.querySelector('#note-color');
+        colorInput.value = color;
+
+        // Update visual selection
+        this.querySelectorAll('.color-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        this.querySelector(`[data-color="${color}"]`).classList.add('selected');
     }
 
     handleKeydown(e) {
@@ -101,6 +151,7 @@ class NoteEditor extends HTMLElement {
         const formData = new FormData(this.querySelector('#note-form'));
         const title = formData.get('title').trim();
         const content = formData.get('content').trim();
+        const color = formData.get('color');
 
         if (!title) {
             showMessage('Please enter a title for your note', 'error');
@@ -111,11 +162,11 @@ class NoteEditor extends HTMLElement {
             this.setLoading(true);
 
             if (this.noteId) {
-                await ApiService.updateNote(this.noteId, title, content);
+                await ApiService.updateNote(this.noteId, title, content, color);
                 showMessage('Note updated successfully');
                 eventBus.emit('note-updated');
             } else {
-                await ApiService.createNote(title, content);
+                await ApiService.createNote(title, content, color);
                 showMessage('Note created successfully');
                 eventBus.emit('note-created');
             }

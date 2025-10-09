@@ -117,13 +117,13 @@ app.get('/api/notes/:id', authenticateToken, (req, res) => {
 });
 
 app.post('/api/notes', authenticateToken, (req, res) => {
-    const { title, content } = req.body;
+    const { title, content, color } = req.body;
 
     if (!title) {
         return res.status(400).json({ error: 'Title is required' });
     }
 
-    db.createNote(req.user.id, title, content || '', function(err) {
+    db.createNote(req.user.id, title, content || '', color, function(err) {
         if (err) {
             return res.status(500).json({ error: 'Failed to create note' });
         }
@@ -132,6 +132,7 @@ app.post('/api/notes', authenticateToken, (req, res) => {
             id: this.lastID,
             title,
             content: content || '',
+            color: color || '#fef3c7',
             user_id: req.user.id
         });
     });
@@ -139,13 +140,13 @@ app.post('/api/notes', authenticateToken, (req, res) => {
 
 app.put('/api/notes/:id', authenticateToken, (req, res) => {
     const noteId = req.params.id;
-    const { title, content } = req.body;
+    const { title, content, color } = req.body;
 
     if (!title) {
         return res.status(400).json({ error: 'Title is required' });
     }
 
-    db.updateNote(noteId, req.user.id, title, content || '', function(err) {
+    db.updateNote(noteId, req.user.id, title, content || '', color, function(err) {
         if (err) {
             return res.status(500).json({ error: 'Failed to update note' });
         }

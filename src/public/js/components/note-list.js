@@ -47,8 +47,10 @@ class NoteList extends HTMLElement {
             ? note.content.substring(0, 150) + (note.content.length > 150 ? '...' : '')
             : 'No content';
 
+        const backgroundColor = note.color || '#fef3c7';
+
         return `
-            <div class="note-card" data-note-id="${note.id}">
+            <div class="note-card" data-note-id="${note.id}" style="background-color: ${backgroundColor};">
                 <h3>${this.escapeHtml(note.title)}</h3>
                 <p>${this.escapeHtml(preview)}</p>
                 <div class="note-date">${formatDate(note.updated_at)}</div>

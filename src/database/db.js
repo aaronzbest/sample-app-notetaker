@@ -30,11 +30,22 @@ class Database {
                     user_id INTEGER NOT NULL,
                     title TEXT NOT NULL,
                     content TEXT,
+                    color TEXT DEFAULT '#fef3c7',
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
             `);
+
+            // Add color column to existing notes table if it doesn't exist
+            this.db.run(`
+                ALTER TABLE notes ADD COLUMN color TEXT DEFAULT '#fef3c7'
+            `, (err) => {
+                // Ignore error if column already exists
+                if (err && !err.message.includes('duplicate column')) {
+                    console.error('Error adding color column:', err);
+                }
+            });
         });
     }
 
@@ -54,14 +65,14 @@ class Database {
         this.db.get('SELECT * FROM notes WHERE id = ? AND user_id = ?', [id, userId], callback);
     }
 
-    createNote(userId, title, content, callback) {
-        this.db.run('INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)', [userId, title, content], callback);
+    createNote(userId, title, content, color, callback) {
+        this.db.run('INSERT INTO notes (user_id, title, content, color) VALUES (?, ?, ?, ?)', [userId, title, content, color || '#fef3c7'], callback);
     }
 
-    updateNote(id, userId, title, content, callback) {
+    updateNote(id, userId, title, content, color, callback) {
         this.db.run(
-            'UPDATE notes SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
-            [title, content, id, userId],
+            'UPDATE notes SET title = ?, content = ?, color = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+            [title, content, color || '#fef3c7', id, userId],
             callback
         );
     }
