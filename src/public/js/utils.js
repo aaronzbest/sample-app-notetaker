@@ -47,17 +47,17 @@ class ApiService {
         return this.request(`/notes/${id}`);
     }
 
-    static async createNote(title, content) {
+    static async createNote(title, content, color) {
         return this.request('/notes', {
             method: 'POST',
-            body: { title, content },
+            body: { title, content, color },
         });
     }
 
-    static async updateNote(id, title, content) {
+    static async updateNote(id, title, content, color) {
         return this.request(`/notes/${id}`, {
             method: 'PUT',
-            body: { title, content },
+            body: { title, content, color },
         });
     }
 
