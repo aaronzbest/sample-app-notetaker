@@ -22,7 +22,7 @@ class NoteEditor extends HTMLElement {
         } catch (error) {
             console.error('Failed to load note:', error);
             showMessage('Failed to load note', 'error');
-            eventBus.emit('show-notes');
+            router.navigate('/');
         }
     }
 
@@ -171,7 +171,7 @@ class NoteEditor extends HTMLElement {
                 eventBus.emit('note-created');
             }
 
-            eventBus.emit('show-notes');
+            router.navigate('/');
         } catch (error) {
             console.error('Failed to save note:', error);
             showMessage('Failed to save note', 'error');
@@ -197,7 +197,7 @@ class NoteEditor extends HTMLElement {
             }
         }
 
-        eventBus.emit('show-notes');
+        router.navigate('/');
     }
 
     setLoading(loading) {
