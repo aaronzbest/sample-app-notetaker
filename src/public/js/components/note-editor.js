@@ -37,6 +37,7 @@ class NoteEditor extends HTMLElement {
                 <div class="editor-header">
                     <h2>${isEditing ? 'Edit Note' : 'New Note'}</h2>
                     <div class="editor-actions">
+                        ${isEditing ? '<button class="btn btn-danger" id="delete-btn">Delete</button>' : ''}
                         <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
                         <button class="btn" id="save-btn">Save</button>
                     </div>
@@ -105,6 +106,7 @@ class NoteEditor extends HTMLElement {
         const form = this.querySelector('#note-form');
         const saveBtn = this.querySelector('#save-btn');
         const cancelBtn = this.querySelector('#cancel-btn');
+        const deleteBtn = this.querySelector('#delete-btn');
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -113,6 +115,10 @@ class NoteEditor extends HTMLElement {
 
         saveBtn.addEventListener('click', () => this.handleSave());
         cancelBtn.addEventListener('click', () => this.handleCancel());
+
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => this.handleDelete());
+        }
 
         // Color picker event listeners
         this.querySelectorAll('.color-option').forEach(option => {
@@ -198,6 +204,26 @@ class NoteEditor extends HTMLElement {
         }
 
         router.navigate('/');
+    }
+
+    async handleDelete() {
+        if (!this.noteId) {
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await ApiService.deleteNote(this.noteId);
+            showMessage('Note deleted successfully');
+            eventBus.emit('note-updated');
+            router.navigate('/');
+        } catch (error) {
+            console.error('Failed to delete note:', error);
+            showMessage('Failed to delete note', 'error');
+        }
     }
 
     setLoading(loading) {
