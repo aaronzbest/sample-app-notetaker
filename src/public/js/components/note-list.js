@@ -54,14 +54,6 @@ class NoteList extends HTMLElement {
                 <h3>${this.escapeHtml(note.title)}</h3>
                 <p>${this.escapeHtml(preview)}</p>
                 <div class="note-date">${formatDate(note.updated_at)}</div>
-                <div class="note-actions">
-                    <button class="btn btn-secondary edit-note" data-note-id="${note.id}">
-                        Edit
-                    </button>
-                    <button class="btn btn-danger delete-note" data-note-id="${note.id}">
-                        Delete
-                    </button>
-                </div>
             </div>
         `;
     }
@@ -89,45 +81,12 @@ class NoteList extends HTMLElement {
     setupEventListeners() {
         this.querySelectorAll('.note-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn')) {
-                    return;
-                }
                 const noteId = card.dataset.noteId;
                 router.navigate(`/note/${noteId}`);
             });
         });
-
-        this.querySelectorAll('.edit-note').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noteId = btn.dataset.noteId;
-                router.navigate(`/note/${noteId}`);
-            });
-        });
-
-        this.querySelectorAll('.delete-note').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noteId = btn.dataset.noteId;
-                this.deleteNote(noteId);
-            });
-        });
     }
 
-    async deleteNote(noteId) {
-        if (!confirm('Are you sure you want to delete this note?')) {
-            return;
-        }
-
-        try {
-            await ApiService.deleteNote(noteId);
-            showMessage('Note deleted successfully');
-            this.loadNotes();
-        } catch (error) {
-            console.error('Failed to delete note:', error);
-            showMessage('Failed to delete note', 'error');
-        }
-    }
 
     escapeHtml(unsafe) {
         return unsafe
