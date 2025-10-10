@@ -29,7 +29,7 @@ class NoteList extends HTMLElement {
         this.innerHTML = `
             <div class="notes-header">
                 <h2>Your Notes</h2>
-                <button class="btn" onclick="router.navigate('/note/new')">
+                <button class="btn" onclick="eventBus.emit('show-editor', null)">
                     New Note
                 </button>
             </div>
@@ -71,7 +71,7 @@ class NoteList extends HTMLElement {
             <div class="empty-state">
                 <h3>No Notes Yet</h3>
                 <p>Create your first note to get started!</p>
-                <button class="btn" onclick="router.navigate('/note/new')">
+                <button class="btn" onclick="eventBus.emit('show-editor', null)">
                     Create Note
                 </button>
             </div>
@@ -93,7 +93,7 @@ class NoteList extends HTMLElement {
                     return;
                 }
                 const noteId = card.dataset.noteId;
-                router.navigate(`/note/${noteId}`);
+                eventBus.emit('show-editor', noteId);
             });
         });
 
@@ -101,7 +101,7 @@ class NoteList extends HTMLElement {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const noteId = btn.dataset.noteId;
-                router.navigate(`/note/${noteId}`);
+                eventBus.emit('show-editor', noteId);
             });
         });
 

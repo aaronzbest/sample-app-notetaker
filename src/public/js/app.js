@@ -6,18 +6,17 @@ class App {
 
     init() {
         this.setupEventListeners();
-        this.updateNavigation();
+        this.checkAuthState();
     }
 
     setupEventListeners() {
         eventBus.on('auth-success', () => {
-            router.navigate('/');
+            this.showNotes();
             this.updateNavigation();
         });
 
         eventBus.on('show-notes', () => this.showNotes());
         eventBus.on('show-editor', (noteId) => this.showEditor(noteId));
-        eventBus.on('show-auth', () => this.showAuth());
 
         const logoutBtn = document.getElementById('logout-btn');
         logoutBtn.addEventListener('click', () => this.logout());
@@ -85,13 +84,12 @@ class App {
     logout() {
         if (confirm('Are you sure you want to logout?')) {
             AuthService.logout();
-            router.navigate('/login');
+            this.showAuth();
             showMessage('Logged out successfully');
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    router = new Router();
     new App();
 });
